@@ -1,0 +1,4 @@
+project_id = "xdsvwkxgocmtqwycyqzh"
+
+[functions.generate-packing-list]
+verify_jwt = false
