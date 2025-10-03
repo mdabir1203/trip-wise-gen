@@ -1,0 +1,14 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Trip Wise Logo</title>
+  <desc id="desc">Stylized backpack inside a rounded gradient square.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#f97316" />
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="104" fill="url(#bg)" />
+  <path d="M176 168c0-30 26-56 56-56h48c30 0 56 26 56 56v32h24c22 0 40 18 40 40v120c0 26-22 48-48 48H160c-26 0-48-22-48-48V240c0-22 18-40 40-40h24zm48-32c-13 0-24 11-24 24v8h112v-8c0-13-11-24-24-24z" fill="#fff" />
+  <circle cx="256" cy="288" r="56" fill="#1d4ed8" opacity="0.2" />
+  <path d="M256 232a56 56 0 1 1 0 112 56 56 0 0 1 0-112zm0 24a32 32 0 1 0 0 64 32 32 0 0 0 0-64z" fill="#fff" />
+</svg>

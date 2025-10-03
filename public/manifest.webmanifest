@@ -1,0 +1,16 @@
+{
+  "name": "Trip Wise - Smart Packing Assistant",
+  "short_name": "Trip Wise",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1d4ed8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48 72x72 96x96 128x128",
+      "type": "image/x-icon"
+    }
+  ]
+}

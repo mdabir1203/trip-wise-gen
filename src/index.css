@@ -92,6 +92,8 @@ All colors MUST be HSL.
   }
 
   body {
+    font-family: "SF Pro Text", "SF Pro Display", "Roboto", "Helvetica Neue", system-ui,
+      -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     @apply bg-background text-foreground antialiased;
   }
 }
@@ -126,5 +128,67 @@ All colors MUST be HSL.
   .touch-target {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  .mobile-safe-area {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+  }
+
+  .mobile-content {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-bottom-tab-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    background: color-mix(in srgb, hsl(var(--background)) 90%, transparent);
+    backdrop-filter: blur(16px);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .fab-shadow {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+  }
+
+  .fade-in {
+    animation: fadeIn 320ms ease-out forwards;
+  }
+
+  .fade-out {
+    animation: fadeOut 260ms ease-in forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(12px);
+    }
   }
 }
