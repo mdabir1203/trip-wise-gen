@@ -14,4 +14,10 @@ export interface PackingListData {
   weatherContext: string;
   culturalTips: string;
   categories: ChecklistCategory[];
+  tripCategory?: string;
+  gender?: string;
+  tripDuration?: number;
+  weatherSummary?: string | null;
+  travelStyle?: string;
+  ageGroup?: string;
 }

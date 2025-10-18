@@ -11,9 +11,17 @@ serve(async (req) => {
   }
 
   try {
-    const { destination, startDate, endDate, ageGroup, travelStyle } = await req.json();
-    
-    console.log('Generating packing list for:', { destination, startDate, endDate, ageGroup, travelStyle });
+    const { destination, startDate, endDate, ageGroup, travelStyle, tripCategory, gender } = await req.json();
+
+    console.log('Generating packing list for:', {
+      destination,
+      startDate,
+      endDate,
+      ageGroup,
+      travelStyle,
+      tripCategory,
+      gender,
+    });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -25,6 +33,8 @@ serve(async (req) => {
     const end = new Date(endDate);
     const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
+    const weatherSummary = await fetchWeatherSummary(destination, startDate, endDate);
+
     // Build comprehensive prompt
     const systemPrompt = `You are an expert travel advisor with deep knowledge of worldwide destinations, climates, cultural norms, and packing best practices. Your task is to create a comprehensive, personalized packing checklist.`;
 
@@ -35,13 +45,18 @@ Trip Details:
 - Travel dates: ${startDate} to ${endDate} (${days} days)
 - Age group: ${ageGroup}
 - Travel style: ${travelStyle}
+- Trip category: ${tripCategory}
+- Traveler gender expression: ${gender}
+- Weather forecast summary: ${weatherSummary ?? 'Real-time forecast unavailable; rely on trusted seasonal guidance.'}
 
 Instructions:
 1. Research the destination's climate during these specific dates
 2. Consider cultural norms and dress codes for ${destination}
 3. Tailor recommendations to ${ageGroup} travelers and ${travelStyle} travel style
-4. Include weather context (temperature ranges, precipitation, seasonal considerations)
+4. Include weather context (temperature ranges, precipitation, seasonal considerations) grounded in the forecast summary above
 5. Add cultural tips relevant to packing choices
+6. If the trip category is wedding, prioritize ceremony and reception attire, accessories for gifting, and contingency plans for formal events for the specified gender expression.
+7. Align garment recommendations with the specified gender expression while offering inclusive alternatives.
 
 Return ONLY a valid JSON object with this EXACT structure (no markdown, no code blocks):
 {
@@ -104,8 +119,21 @@ Make items specific and actionable. For clothing, specify quantities (e.g., "3 t
     
     const result = JSON.parse(content);
 
+    const enrichedResult = {
+      ...result,
+      weatherContext: weatherSummary
+        ? `${weatherSummary} ${result.weatherContext}`.trim()
+        : result.weatherContext,
+      weatherSummary: weatherSummary ?? null,
+      tripCategory,
+      gender,
+      travelStyle,
+      ageGroup,
+      tripDuration: days,
+    };
+
     return new Response(
-      JSON.stringify(result),
+      JSON.stringify(enrichedResult),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
@@ -119,3 +147,70 @@ Make items specific and actionable. For clothing, specify quantities (e.g., "3 t
     );
   }
 });
+
+async function fetchWeatherSummary(destination: string, startDate: string, endDate: string) {
+  try {
+    if (!destination || !startDate || !endDate) {
+      return null;
+    }
+
+    const geoResponse = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(destination)}&count=1&language=en&format=json`
+    );
+
+    if (!geoResponse.ok) {
+      console.error('Geocoding API error:', geoResponse.status, await geoResponse.text());
+      return null;
+    }
+
+    const geoData = await geoResponse.json();
+    if (!geoData?.results?.length) {
+      return null;
+    }
+
+    const { latitude, longitude, timezone } = geoData.results[0];
+
+    const weatherUrl = new URL('https://api.open-meteo.com/v1/forecast');
+    weatherUrl.searchParams.set('latitude', String(latitude));
+    weatherUrl.searchParams.set('longitude', String(longitude));
+    weatherUrl.searchParams.set('start_date', startDate);
+    weatherUrl.searchParams.set('end_date', endDate);
+    weatherUrl.searchParams.set('daily', 'temperature_2m_max,temperature_2m_min,precipitation_sum');
+    weatherUrl.searchParams.set('timezone', timezone ?? 'auto');
+
+    const weatherResponse = await fetch(weatherUrl);
+    if (!weatherResponse.ok) {
+      console.error('Weather API error:', weatherResponse.status, await weatherResponse.text());
+      return null;
+    }
+
+    const weatherData = await weatherResponse.json();
+    const daily = weatherData?.daily;
+    if (!daily?.time?.length) {
+      return null;
+    }
+
+    const maxTemps: number[] = daily.temperature_2m_max ?? [];
+    const minTemps: number[] = daily.temperature_2m_min ?? [];
+    const precipitation: number[] = daily.precipitation_sum ?? [];
+
+    if (!maxTemps.length || !minTemps.length) {
+      return null;
+    }
+
+    const highest = Math.max(...maxTemps);
+    const lowest = Math.min(...minTemps);
+    const totalPrecip = precipitation.reduce((sum, value) => sum + (value ?? 0), 0);
+
+    const highestF = Math.round((highest * 9) / 5 + 32);
+    const lowestF = Math.round((lowest * 9) / 5 + 32);
+
+    const rangeSummary = `Forecast between ${startDate} and ${endDate}: highs up to ${highest.toFixed(1)}°C (${highestF}°F) and lows near ${lowest.toFixed(1)}°C (${lowestF}°F).`;
+    const precipSummary = `Total expected precipitation: ${totalPrecip.toFixed(1)} mm.`;
+
+    return `${rangeSummary} ${precipSummary}`;
+  } catch (error) {
+    console.error('Unable to fetch weather summary', error);
+    return null;
+  }
+}
