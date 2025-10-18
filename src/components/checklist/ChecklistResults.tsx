@@ -44,6 +44,44 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
 }: ChecklistResultsProps) {
   return (
     <div className="space-y-4 pb-28">
+      <Card className="rounded-3xl border-none bg-muted/40 p-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-xs uppercase text-muted-foreground">Trip category</p>
+            <p className="text-sm font-semibold capitalize">
+              {checklistData.tripCategory?.replace(/-/g, " ") ?? "Personalized"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs uppercase text-muted-foreground">Traveler</p>
+            <p className="text-sm font-semibold capitalize">
+              {
+                [checklistData.ageGroup, checklistData.gender]
+                  .filter(Boolean)
+                  .map((value) => value?.replace(/-/g, " "))
+                  .join(" · ") || "Custom"
+              }
+            </p>
+          </div>
+          <div>
+            <p className="text-xs uppercase text-muted-foreground">Travel style</p>
+            <p className="text-sm font-semibold capitalize">
+              {checklistData.travelStyle?.replace(/-/g, " ") ?? "Personalized"}
+            </p>
+          </div>
+          {checklistData.tripDuration && (
+            <div>
+              <p className="text-xs uppercase text-muted-foreground">Trip duration</p>
+              <p className="text-sm font-semibold">{checklistData.tripDuration} days</p>
+            </div>
+          )}
+        </div>
+        {checklistData.weatherSummary && (
+          <div className="mt-4 rounded-2xl bg-background/80 p-3 text-sm text-muted-foreground">
+            {checklistData.weatherSummary}
+          </div>
+        )}
+      </Card>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Card className="bg-primary/10 border-primary/20">
           <CardHeader className="pb-3">

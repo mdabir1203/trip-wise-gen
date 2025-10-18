@@ -17,7 +17,9 @@ import {
   Loader2,
   MapPin,
   Plus,
+  Sparkles,
   User,
+  UsersRound,
   WifiOff,
 } from "lucide-react";
 
@@ -33,8 +35,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import { BottomTabBar } from "@/components/mobile/BottomTabBar";
 import { FloatingActionButton } from "@/components/mobile/FloatingActionButton";
+import { FeedbackAutomationPanel } from "@/components/feedback/FeedbackAutomationPanel";
+import { PwaInstallPrompt } from "@/components/settings/PwaInstallPrompt";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { supabase } from "@/integrations/supabase/client";
+import { useFeedbackAutomation } from "@/hooks/use-feedback-automation";
 
 import { ChecklistItem, PackingListData } from "./checklist/types";
 
@@ -56,6 +61,21 @@ const travelStyles = [
   { value: "solo", label: "Solo" },
 ];
 
+const tripCategories = [
+  { value: "vacation", label: "Vacation" },
+  { value: "wedding", label: "Wedding" },
+  { value: "conference", label: "Conference" },
+  { value: "wellness", label: "Wellness" },
+  { value: "festival", label: "Festival" },
+];
+
+const genderOptions = [
+  { value: "female", label: "Female" },
+  { value: "male", label: "Male" },
+  { value: "non-binary", label: "Non-binary" },
+  { value: "binary", label: "Binary" },
+];
+
 function triggerHaptic(pattern: number | number[] = 16) {
   if ("vibrate" in navigator) {
     try {
@@ -73,6 +93,8 @@ export function PackingChecklist() {
   const [endDate, setEndDate] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
   const [travelStyle, setTravelStyle] = useState("");
+  const [tripCategory, setTripCategory] = useState("");
+  const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(false);
   const [checklistData, setChecklistData] = useState<PackingListData | null>(null);
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
@@ -83,6 +105,8 @@ export function PackingChecklist() {
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | "unsupported">("default");
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const feedbackAutomation = useFeedbackAutomation();
+  const { registerTripGeneration } = feedbackAutomation;
 
   useEffect(() => {
     const handleOnlineStatus = () => setIsOffline(!navigator.onLine);
@@ -140,7 +164,7 @@ export function PackingChecklist() {
 
   const handleGenerate = useCallback(
     async (isRefresh = false) => {
-      if (!destination || !startDate || !endDate || !ageGroup || !travelStyle) {
+      if (!destination || !startDate || !endDate || !ageGroup || !travelStyle || !tripCategory || !gender) {
         if (!isRefresh) {
           toast.error("Please fill in all fields");
         }
@@ -155,13 +179,20 @@ export function PackingChecklist() {
       setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke("generate-packing-list", {
-          body: { destination, startDate, endDate, ageGroup, travelStyle },
+          body: { destination, startDate, endDate, ageGroup, travelStyle, tripCategory, gender },
         });
 
         if (error) throw error;
 
-        setChecklistData(data);
+        setChecklistData({
+          ...data,
+          tripCategory,
+          gender,
+          travelStyle,
+          ageGroup,
+        });
         if (!isRefresh) {
+          registerTripGeneration();
           toast.success("Packing list generated!");
           triggerHaptic();
           setActiveTab("pack");
@@ -175,7 +206,7 @@ export function PackingChecklist() {
         setLoading(false);
       }
     },
-    [ageGroup, destination, endDate, startDate, travelStyle]
+    [ageGroup, destination, endDate, gender, registerTripGeneration, startDate, travelStyle, tripCategory]
   );
 
   const pullToRefreshRef = usePullToRefresh<HTMLDivElement>({
@@ -258,6 +289,15 @@ export function PackingChecklist() {
 
     let text = `PACKING LIST FOR ${destination.toUpperCase()}\n`;
     text += `${startDate} to ${endDate}\n\n`;
+    text += `TRIP CATEGORY: ${tripCategory.toUpperCase()}\n`;
+    text += `TRAVEL STYLE: ${travelStyle.toUpperCase()}\n`;
+    text += `TRAVELER PROFILE: ${ageGroup} | ${gender}\n`;
+    if (checklistData.tripDuration) {
+      text += `TRIP DURATION: ${checklistData.tripDuration} days\n`;
+    }
+    if (checklistData.weatherSummary) {
+      text += `WEATHER SNAPSHOT: ${checklistData.weatherSummary}\n`;
+    }
     text += `WEATHER: ${checklistData.weatherContext}\n\n`;
     text += `CULTURAL TIPS: ${checklistData.culturalTips}\n\n`;
 
@@ -269,13 +309,33 @@ export function PackingChecklist() {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard!");
     if (hapticsEnabled) triggerHaptic([16, 6, 16]);
-  }, [checklistData, checklistItems, destination, endDate, hapticsEnabled, startDate]);
+  }, [
+    ageGroup,
+    checklistData,
+    checklistItems,
+    destination,
+    endDate,
+    gender,
+    hapticsEnabled,
+    startDate,
+    travelStyle,
+    tripCategory,
+  ]);
 
   const downloadChecklist = useCallback(() => {
     if (!checklistData) return;
 
     let text = `PACKING LIST FOR ${destination.toUpperCase()}\n`;
     text += `${startDate} to ${endDate}\n\n`;
+    text += `TRIP CATEGORY: ${tripCategory.toUpperCase()}\n`;
+    text += `TRAVEL STYLE: ${travelStyle.toUpperCase()}\n`;
+    text += `TRAVELER PROFILE: ${ageGroup} | ${gender}\n`;
+    if (checklistData.tripDuration) {
+      text += `TRIP DURATION: ${checklistData.tripDuration} days\n`;
+    }
+    if (checklistData.weatherSummary) {
+      text += `WEATHER SNAPSHOT: ${checklistData.weatherSummary}\n`;
+    }
     text += `WEATHER: ${checklistData.weatherContext}\n\n`;
     text += `CULTURAL TIPS: ${checklistData.culturalTips}\n\n`;
 
@@ -292,7 +352,17 @@ export function PackingChecklist() {
     anchor.click();
     URL.revokeObjectURL(url);
     toast.success("Checklist downloaded!");
-  }, [checklistData, checklistItems, destination, endDate, startDate]);
+  }, [
+    ageGroup,
+    checklistData,
+    checklistItems,
+    destination,
+    endDate,
+    gender,
+    startDate,
+    travelStyle,
+    tripCategory,
+  ]);
 
   const requestNotifications = useCallback(async () => {
     if (!("Notification" in window)) {
@@ -441,6 +511,43 @@ export function PackingChecklist() {
             </Select>
           </div>
 
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-semibold">
+                <Sparkles className="h-4 w-4" /> Trip Category
+              </Label>
+              <Select value={tripCategory} onValueChange={setTripCategory}>
+                <SelectTrigger className="touch-target rounded-2xl">
+                  <SelectValue placeholder="Choose category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tripCategories.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-semibold">
+                <UsersRound className="h-4 w-4" /> Gender Expression
+              </Label>
+              <Select value={gender} onValueChange={setGender}>
+                <SelectTrigger className="touch-target rounded-2xl">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  {genderOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="space-y-3">
             <Label className="flex items-center gap-2 text-sm font-semibold">
               <Download className="h-4 w-4" /> Travel Style
@@ -555,6 +662,8 @@ export function PackingChecklist() {
           </div>
         </div>
       </Card>
+      <FeedbackAutomationPanel automation={feedbackAutomation} />
+      <PwaInstallPrompt />
     </div>
   );
 
