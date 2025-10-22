@@ -37,6 +37,7 @@ import { BottomTabBar } from "@/components/mobile/BottomTabBar";
 import { FloatingActionButton } from "@/components/mobile/FloatingActionButton";
 import { FeedbackAutomationPanel } from "@/components/feedback/FeedbackAutomationPanel";
 import { PwaInstallPrompt } from "@/components/settings/PwaInstallPrompt";
+import { VoiceInput } from "@/components/VoiceInput";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { supabase } from "@/integrations/supabase/client";
 import { useFeedbackAutomation } from "@/hooks/use-feedback-automation";
@@ -441,7 +442,7 @@ export function PackingChecklist() {
 
   const planContent = (
     <div className="space-y-5">
-      <Card className="rounded-3xl border-none bg-gradient-to-br from-background via-background to-primary/5 shadow-lg shadow-primary/10">
+      <Card className="glass-card rounded-3xl border-none shadow-2xl">
         <CardHeader className="pb-4">
           <CardTitle className="text-2xl font-semibold">Trip Details</CardTitle>
           <CardDescription>Personalize your mobile-ready packing assistant</CardDescription>
@@ -457,13 +458,14 @@ export function PackingChecklist() {
                 placeholder="Tokyo, Paris, New York"
                 value={destination}
                 onChange={(event) => setDestination(event.target.value)}
-                className="flex-1 touch-target rounded-2xl"
+                className="glass-input flex-1 touch-target rounded-2xl border-white/20"
                 inputMode="text"
                 autoComplete="on"
               />
-              <Button variant="secondary" size="icon" className="rounded-2xl" onClick={locateMe}>
+              <Button variant="secondary" size="icon" className="glass-button rounded-2xl" onClick={locateMe}>
                 <MapPin className="h-4 w-4" />
               </Button>
+              <VoiceInput onTranscript={setDestination} />
             </div>
           </div>
 
@@ -477,7 +479,7 @@ export function PackingChecklist() {
                 type="date"
                 value={startDate}
                 onChange={(event) => setStartDate(event.target.value)}
-                className="touch-target rounded-2xl"
+                className="glass-input touch-target rounded-2xl border-white/20"
               />
             </div>
             <div className="space-y-2">
@@ -489,7 +491,7 @@ export function PackingChecklist() {
                 type="date"
                 value={endDate}
                 onChange={(event) => setEndDate(event.target.value)}
-                className="touch-target rounded-2xl"
+                className="glass-input touch-target rounded-2xl border-white/20"
               />
             </div>
           </div>
@@ -499,7 +501,7 @@ export function PackingChecklist() {
               <User className="h-4 w-4" /> Age Group
             </Label>
             <Select value={ageGroup} onValueChange={setAgeGroup}>
-              <SelectTrigger className="touch-target rounded-2xl">
+              <SelectTrigger className="glass-input touch-target rounded-2xl border-white/20">
                 <SelectValue placeholder="Select age group" />
               </SelectTrigger>
               <SelectContent>
@@ -517,7 +519,7 @@ export function PackingChecklist() {
                 <Sparkles className="h-4 w-4" /> Trip Category
               </Label>
               <Select value={tripCategory} onValueChange={setTripCategory}>
-                <SelectTrigger className="touch-target rounded-2xl">
+                <SelectTrigger className="glass-input touch-target rounded-2xl border-white/20">
                   <SelectValue placeholder="Choose category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -534,7 +536,7 @@ export function PackingChecklist() {
                 <UsersRound className="h-4 w-4" /> Gender Expression
               </Label>
               <Select value={gender} onValueChange={setGender}>
-                <SelectTrigger className="touch-target rounded-2xl">
+                <SelectTrigger className="glass-input touch-target rounded-2xl border-white/20">
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -554,7 +556,7 @@ export function PackingChecklist() {
             </Label>
             <ToggleGroup
               type="single"
-              className="grid grid-cols-2 gap-2 rounded-2xl bg-muted/60 p-2"
+              className="glass-card grid grid-cols-2 gap-2 rounded-2xl p-2"
               value={travelStyle}
               onValueChange={(value) => value && setTravelStyle(value)}
             >
@@ -573,7 +575,7 @@ export function PackingChecklist() {
           <Button
             onClick={() => void handleGenerate(false)}
             disabled={loading}
-            className="w-full touch-target rounded-2xl text-base font-semibold shadow-lg shadow-primary/25"
+            className="glass-button w-full touch-target rounded-2xl text-base font-semibold shadow-2xl shadow-primary/30 hover:shadow-primary/40"
             size="lg"
           >
             {loading ? (
@@ -589,7 +591,7 @@ export function PackingChecklist() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-3xl border-none bg-muted/40 p-4">
+      <Card className="glass-card rounded-3xl border-none p-4 shadow-lg">
         <CardTitle className="text-base font-semibold">Packing Progress</CardTitle>
         <CardContent className="mt-4 space-y-3 p-0">
           <Progress value={progress} className="h-3 rounded-full" />
@@ -603,7 +605,7 @@ export function PackingChecklist() {
 
   const remindersContent = (
     <div className="space-y-4">
-      <Card className="rounded-3xl border-none bg-muted/40 p-6">
+      <Card className="glass-card rounded-3xl border-none p-6 shadow-lg">
         <CardTitle className="text-lg font-semibold">Reminder Center</CardTitle>
         <p className="mt-2 text-sm text-muted-foreground">
           Sync reminders across devices with push notifications and offline support.
@@ -627,7 +629,7 @@ export function PackingChecklist() {
 
   const settingsContent = (
     <div className="space-y-4">
-      <Card className="rounded-3xl border-none bg-muted/40 p-6">
+      <Card className="glass-card rounded-3xl border-none p-6 shadow-lg">
         <CardTitle className="text-lg font-semibold">Mobile Preferences</CardTitle>
         <div className="mt-4 space-y-6">
           <div className="flex items-center justify-between">
@@ -694,7 +696,7 @@ export function PackingChecklist() {
       />
     </Suspense>
   ) : (
-    <Card className="rounded-3xl border-none bg-muted/40 p-8 text-center">
+    <Card className="glass-card rounded-3xl border-none p-8 text-center shadow-lg">
       <CardTitle className="text-lg font-semibold">Generate a packing list to get started</CardTitle>
       <p className="mt-2 text-sm text-muted-foreground">
         Complete your trip details and tap Generate to see personalized recommendations.
@@ -704,7 +706,7 @@ export function PackingChecklist() {
 
   return (
     <div className="mobile-shell">
-      <header className="mobile-safe-area sticky top-0 z-40 bg-background/95 px-4 py-4 backdrop-blur-md">
+      <header className="glass-card mobile-safe-area sticky top-0 z-40 border-0 px-4 py-4 shadow-md">
         <div className="mx-auto flex w-full max-w-xl items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold">Trip Wise</h1>

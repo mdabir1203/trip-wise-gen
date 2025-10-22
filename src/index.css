@@ -8,61 +8,57 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Travel-inspired gradient backgrounds */
-    --background: 210 100% 97%;
+    /* Glassmorphic background - soft gradient */
+    --background: 210 50% 98%;
     --foreground: 222 47% 11%;
 
-    /* Card styles with subtle elevation */
+    /* Glass card - semi-transparent */
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Primary: Sky/Ocean blue */
+    /* Primary: Ocean blue */
     --primary: 203 89% 53%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Warm coral/sunset */
+    /* Secondary: Warm coral */
     --secondary: 14 90% 65%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Muted backgrounds */
+    /* Muted glass surfaces */
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    /* Accent: Fresh travel green */
+    /* Accent: Travel green */
     --accent: 142 76% 36%;
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive: Alert red */
+    /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs */
+    /* Subtle borders for glass effect */
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 203 89% 53%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Progress bar gradient */
-    --progress-start: 203 89% 53%;
-    --progress-end: 142 76% 36%;
-
-    /* Gradient backgrounds */
-    --gradient-hero: linear-gradient(135deg, hsl(203 89% 53%) 0%, hsl(14 90% 65%) 100%);
-    --gradient-card: linear-gradient(to bottom, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
+    /* Glassmorphic gradients */
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+    --gradient-glass-border: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%);
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 222 47% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 222 47% 15%;
+    --card: 222 47% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 47% 15%;
+    --popover: 222 47% 12%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 203 89% 53%;
@@ -71,7 +67,7 @@ All colors MUST be HSL.
     --secondary: 14 90% 65%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 217 33% 18%;
+    --muted: 217 33% 15%;
     --muted-foreground: 215 20% 65%;
 
     --accent: 142 76% 36%;
@@ -80,9 +76,12 @@ All colors MUST be HSL.
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
+    --border: 217 33% 15%;
+    --input: 217 33% 15%;
     --ring: 203 89% 53%;
+
+    --gradient-glass: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(30, 41, 59, 0.3) 100%);
+    --gradient-glass-border: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
   }
 }
 
@@ -99,12 +98,26 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  .gradient-hero {
-    background: var(--gradient-hero);
+  .glass-card {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
   }
 
-  .gradient-card {
-    background: var(--gradient-card);
+  .glass-input {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .glass-button {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .animate-check {

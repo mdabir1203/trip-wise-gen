@@ -44,7 +44,7 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
 }: ChecklistResultsProps) {
   return (
     <div className="space-y-4 pb-28">
-      <Card className="rounded-3xl border-none bg-muted/40 p-5">
+      <Card className="glass-card rounded-3xl border-none p-5 shadow-lg">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <p className="text-xs uppercase text-muted-foreground">Trip category</p>
@@ -83,7 +83,7 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
         )}
       </Card>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Card className="bg-primary/10 border-primary/20">
+        <Card className="glass-card border-none shadow-md">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Weather Context</CardTitle>
           </CardHeader>
@@ -93,7 +93,7 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-secondary/10 border-secondary/20">
+        <Card className="glass-card border-none shadow-md">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Cultural Tips</CardTitle>
           </CardHeader>
@@ -105,9 +105,9 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
         </Card>
       </div>
 
-      <Card>
+      <Card className="glass-card border-none shadow-lg">
         <CardContent className="space-y-4 pt-6">
-          <div className="space-y-3 rounded-2xl bg-muted/60 p-4">
+          <div className="space-y-3 glass-card rounded-2xl p-4">
             <div className="flex items-center justify-between text-sm font-medium">
               <span>Packing Progress</span>
               <span className="text-muted-foreground">
@@ -121,18 +121,18 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <Button onClick={onCopy} variant="outline" className="touch-target text-xs font-semibold">
+            <Button onClick={onCopy} variant="outline" className="glass-button touch-target text-xs font-semibold">
               Copy
             </Button>
-            <Button onClick={onDownload} variant="outline" className="touch-target text-xs font-semibold">
+            <Button onClick={onDownload} variant="outline" className="glass-button touch-target text-xs font-semibold">
               <Download className="mr-2 h-4 w-4" />Download
             </Button>
-            <Button onClick={onResetChecklist} variant="outline" className="touch-target text-xs font-semibold">
+            <Button onClick={onResetChecklist} variant="outline" className="glass-button touch-target text-xs font-semibold">
               <X className="mr-2 h-4 w-4" />Reset
             </Button>
             <Select onValueChange={(value) => onSetReminder(Number(value))}>
               <SelectTrigger
-                className={`touch-target text-xs font-semibold ${reminderSet ? "bg-accent/10 border-accent" : ""}`}
+                className={`glass-input touch-target text-xs font-semibold border-white/20 ${reminderSet ? "ring-2 ring-accent" : ""}`}
               >
                 <SelectValue placeholder="Set Reminder" />
               </SelectTrigger>
@@ -153,17 +153,17 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass-card border-none shadow-lg">
         <CardContent className="space-y-3 pt-6">
-          <div className="flex items-center gap-2 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-3">
+          <div className="flex items-center gap-2 rounded-2xl border border-dashed border-primary/40 glass-card p-3">
             <Input
               placeholder="Add custom task..."
               value={customTask}
               onChange={(event) => onCustomTaskChange(event.target.value)}
               onKeyDown={(event) => event.key === "Enter" && onCustomTaskSubmit()}
-              className="touch-target text-sm"
+              className="glass-input touch-target text-sm border-white/20"
             />
-            <Button onClick={onCustomTaskSubmit} size="sm" className="touch-target">
+            <Button onClick={onCustomTaskSubmit} size="sm" className="glass-button touch-target">
               Add
             </Button>
           </div>
@@ -171,8 +171,8 @@ const ChecklistResultsComponent = memo(function ChecklistResults({
       </Card>
 
       {Object.entries(groupedItems).map(([category, items]) => (
-        <Card key={category} className="overflow-hidden">
-          <CardHeader className="bg-muted/60 py-4">
+        <Card key={category} className="glass-card overflow-hidden border-none shadow-lg">
+          <CardHeader className="glass-card py-4 border-0">
             <CardTitle className="text-base font-semibold">{category}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1 py-3">
